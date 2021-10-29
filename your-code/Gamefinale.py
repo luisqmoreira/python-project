@@ -2,7 +2,10 @@
 # Game Room
 import pandas as pd
 import random
+import random
+import time
 
+# defining items and rooms
 couch = {
     "name": "couch",
     "type": "furniture",
@@ -168,10 +171,14 @@ INIT_GAME_STATE = {
     "keys_collected": [],
     "target_room": outside
 }
-
+# placeholder variable used in examine_item function
 tries = 0
+
+
 def challenge():
-    import random
+    # play quiz, shows up whenever you try to move to the next room after unlocking the door.
+    # it will randomly select one from a list of question
+    # If you fail it will select another question until you get it right
 
     d = {"What's the capital of Venezuela - Buenos Aires, Lima or Caracas?": "Caracas",
          "What's the name of the first Imperator of Rome? - Julius Cesar, Cesar Augustus or Romulus Augustus?": "Cesar Augustus",
@@ -276,10 +283,13 @@ def examine_item(item_name):
     play either the current or the next room depending on the game state
     to keep playing.
     """
+    # global used to bring the value outside, otherwise it will reset everytime the function runs
     global tries
     current_room = game_state["current_room"]
     next_room = ""
     output = None
+
+    # limits the tries to 2, tries are the number of times you can examine items before you find the keys
     if tries < 2:
         for item in object_relations[current_room["name"]]:
             if (item["name"] == item_name):
@@ -306,6 +316,7 @@ def examine_item(item_name):
                 print(output)
                 break
     else:
+        # if tries are exceeded it will return a message communicating to the player that he lost, reset the tries to 0 and restart the game
         print('You lost! Try again')
         tries = 0
         return play_room(game_room)
@@ -323,22 +334,33 @@ def examine_item(item_name):
 
 
 
-import time
 
 game_state = INIT_GAME_STATE.copy()
+
+# Player will be prompted to input its name before starting game
 player_name = input('Write your name ')
 
+
+# time_start begins counting the time when the player begins the game
 time_start = time.time()
 start_game()
+
+# time_ends when the player passes the last door and finishes the game
 time_passed = time.time() - time_start
 
+
+# if time is less than 100 seconds it will return you're good else 'you can do this better
 if (time.time() - time_start) <= 100.0:
     print("you are good 😊")
 else:
     (time.time() - time_start) >= 100.0
     print("you can do this better 😑")
 
+
+# Returns player name with the result in seconds
 print(str(player_name) + ' you finished the game in ' + str(round((time_passed), 2)) + 'seconds')
+
+# generates and saves a file in txt with the player's name and time
 ranking_table = open('standings ' + str(player_name) + '.txt', 'w')
 
 with  ranking_table:
